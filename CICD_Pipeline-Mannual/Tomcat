@@ -1,0 +1,40 @@
+Tomcat Integration & Configuration:
+
+Tomcat Installation:
+	[] yum install java-1.8.0-openjdk-devel -y
+	[] wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.120/bin/apache-tomcat-9.0.120.tar.gz
+	[] tar -xvzf apache-tomcat-9.0.120.tar.gz
+	[] cd apache-tomcat-9.0.120
+	[] ls -latr
+	[] cd conf/
+-> Add below lines in tomcatusers.xml
+	[] vi tomcatusers.xml
+	<role rolename=”manager-gui”/>
+	<role rolename=”manager-script”/>
+	<user username=”tomcat” password=”tomcat” roles=”manager-script,manager-gui”/>
+-> After adding above lines save the file
+-> Navigate to apache-tomcat-9.0.120/webapps/manager/META-INF
+	[] vi context.xml
+-> Comment the below line
+	<!--
+	  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+	        allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+	-->
+-> Save the file and exit.
+-> Start the tomcat 
+	[] cd apache-tomcat-9.0.120/bin
+	[] ./startup.sh
+-> Here tomcat will start 
+-> Hit the browser with PubIP:8080
+-> Click on manager app and login with credentials.
+
+Configuring Job:
+-> Go to Jenkins UI > Install the Deploy to Container plugin.
+-> Go to Build → Source Code Management → Select Git → Provide the Repository URL → Click on build steps > Invoke top-level Maven targets > Provide the Maven version and set the goal as install -DskipTests > Click on Post build follow this
+	[] WAR/EAR File: **/*.war
+	[] Content Path: Where we gonna Store
+-> Add Credentials > Click On Username and Password
+	Username: tomcat
+	Password: tomcat
+	ID: Tomcat > Create
+	Tomcat URL: PubIP:8080 > Save

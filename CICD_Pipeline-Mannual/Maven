@@ -1,0 +1,17 @@
+Maven Integration:
+
+Install Maven Plugin in Jenkins
+- Go to Manage Jenkins
+- Click on Plugins → Available Plugins
+- Search for Maven Plugins and Click on Install
+Maven Setup in Jenkins and Configuring the Maven tool:
+- Go to Manage Jenkins → Global Tool Configuration → Maven
+- Click Add Maven, give it a name and version
+- Click Apply and Save
+Example job configuration:
+- Click New Item, give it a name, click OK
+- Go to Configuration → Source Code Management → select Git → provide the repository URL
+- Go to Build → Invoke top-level Maven targets
+- Provide the Maven version and set the goal as install
+- Click Apply and Save
+- Click Build Now and check the console output

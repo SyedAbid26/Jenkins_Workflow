@@ -1,0 +1,6 @@
+Git integration:
+
+-> For git integration first we must install git in Jenkins server.
+	[] yum -y install git
+-> Click on 'New Item,' then enter the item name, click on 'Freestyle project,' then click 'OK.
+-> Navigate to Source Code Management, Click on Git, enter the URL, Click Apply and Save, then click Build Now and check the console output.

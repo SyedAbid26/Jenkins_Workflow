@@ -1,0 +1,18 @@
+We have to integrate CI/CD in one go, so that jobs run one after another. For that, we need to install a plugin. Steps:
+
+Install the Build Pipeline plugin: 
+-> Go to Manage Jenkins > Plugins > Install Build Pipeline Plugin
+Create the Pipeline View:
+-> Go to Dashboard > New View > Give a name > Select Build Pipeline View > Click Create
+Configure the view:
+-> Give a name > In Pipeline Flow, select Initial Job as GIT_Integration - this is the job the whole chain will start from.
+Chain GIT_Integration to Maven_Integration:
+-> Go to GIT_Integration job > Post-Build Actions > Select Build other projects > Enter Maven_Integration as the project to trigger next.
+Chain Maven_Integration to Nexus_Integration:
+-> Go to Maven_Integration job > Build Triggers > Select Build after other projects are built > Enter the project to watch (GIT_Integration) > In Post-Build Actions, select Build other projects > Enter the next project's name (Nexus_Integration)
+Chain Nexus_Integration to Tomcat_Integration:
+-> Go to Nexus_Integration job > Build Triggers > Select Build after other projects are built > Enter the project to watch (Maven_Integration) > In Post-Build Actions, select Build other projects > Enter the next project's name (Tomcat_Integration)
+Set the final (Tomcat) job's trigger:
+-> Go to Tomcat_Integration job > Build Triggers > Select Build after other projects are built > Enter the project to watch (Nexus_Integration) > No Post-Build Actions needed since it's the last stage.
+Run the pipeline
+-> Go to the Build Pipeline View you created and click Run (or the trigger icon on GIT_Integration). Each job should fire the next automatically once it succeeds.
