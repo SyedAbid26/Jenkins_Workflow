@@ -19,7 +19,7 @@ Installation of Jenkins:
 	[] systemctl start jenkins
 -> We can check the status of the Jenkins service using the command:
 	[] systemctl status Jenkins
-------------------------------------------------------------------------------
+
 Configuring Jenkins:
 -> Connect to http://<your_server_public_DNS>:8080 from the browser. We will be able to access Jenkins through its management interface:
 	[] http://PublicIP:8080
