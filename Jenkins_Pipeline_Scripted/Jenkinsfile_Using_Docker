@@ -1,36 +1,30 @@
 pipeline {
     agent any
-
     tools {
         maven 'Maven'
     }
-
     stages {
         stage('Clean Workspace') {
             steps {
                 cleanWs()
             }
         }
-
         stage('Clone Repository') {
             steps {
                 git branch: 'main',
-                    url: ''
+                    url: '<YOUR_REPO_URL_HERE>'
             }
         }
-
         stage('Verify Tools') {
             steps {
                 sh 'mvn -version'
             }
         }
-
         stage('Build') {
             steps {
                 sh 'mvn clean package'
             }
         }
-        
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('Sonarqube') {
@@ -42,13 +36,18 @@ pipeline {
                 }
             }
         }
-
         stage('Artifact uploader') {
             steps {
-                nexusArtifactUploader artifacts: [[artifactId: 'my-app', classifier: '', file: 'target/my-app.war', type: 'war']], credentialsId: 'Nexus-Credentials', groupId: 'com.company', nexusUrl: 'PubIP:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'Nexus-Repo_Name', version: '1.0-SNAPSHOT'
+                nexusArtifactUploader artifacts: [[artifactId: 'my-app', classifier: '', file: 'target/my-app.war', type: 'war']],
+                    credentialsId: 'Nexus-Credentials',
+                    groupId: 'com.company',
+                    nexusUrl: 'PubIP:8081',
+                    nexusVersion: 'nexus3',
+                    protocol: 'http',
+                    repository: 'Nexus-Repo_Name',
+                    version: '1.0-SNAPSHOT'
             }
         }
-        
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -58,15 +57,13 @@ pipeline {
                 '''
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'Docker-Creds',
-                    usernameVariable: 'Docker Username',
-                    passwordVariable: 'Docker Passwd'
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
                 )]) {
-
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                     docker push Username/ImgName:latest
@@ -75,21 +72,18 @@ pipeline {
                 }
             }
         }
-        
         stage('Deploy') {
             steps {
                 sh '''
                 docker pull Username/ImgName:latest
-
                 docker stop my-app || true
                 docker rm my-app || true
-
                 docker run -d \
                 --name my-app \
                 -p 8083:8080 \
                 Username/ImgName:latest
                 '''
             }
-        }  
+        }
     }
 }
