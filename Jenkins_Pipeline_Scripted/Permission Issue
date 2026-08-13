@@ -1,0 +1,40 @@
+Solution1: 
+Jenkins + Docker permissions issue the `Jenkins` user doesn't have permission to talk to the Docker daemon socket.One important note: if Jenkins itself is running "inside a Docker container' (a common setup), adding a group inside the container won't fix it you'd instead need to either:
+# Add jenkins user to the docker group:
+-> Run on the Jenkins server/agent (not inside a container): 
+	[] sudo usermod -aG docker jenkins
+# Restart Jenkins so the group change takes effect:
+-> If Jenkins runs as a systemd service:
+	[] sudo systemctl restart Jenkins
+-> Group membership is only picked up on a fresh login/process start, so a simple job re-run won't pick it up the Jenkins service itself must restart.
+# Check docker.sock permissions:
+	[] ls -l /var/run/docker.sock 
+-> It should be owned by root:docker with rw permissions for the group. If the group isn't 'docker', adjust the group in step 1 to match.
+# Verify as the jenkins user:
+	[] sudo -u jenkins docker ps 
+-> If this works without a permission error, the fix took effect. If it still fails, log out/reboot the machine since group membership sometimes needs a full session restart.
+# Re-run the pipeline:
+-> Trigger the Jenkins job again. The 'Build Docker Image' stage should now be able to reach the Docker daemon socket successfully.
+
+Solition2: 
+Since the group fix didn't take, let's figure out exactly what's blocking it. Run these on the Jenkins server
+# Check if jenkins user is actually in the docker group:
+	[] id jenkins 
+-> Check whether 'docker' appears in the group list. If it doesn't show up here, the usermod command either wasn't run, targeted the wrong user, or Jenkins hasn't been restarted since.
+# Confirm which user Jenkins process runs as:
+	[] cat /lib/systemd/system/jenkins.service | grep user
+-> Confirm the actual OS user Jenkins runs as. On some installs it's not literally 'jenkins'.
+# Check the live Jenkins process owner:
+	[] ps aux | grep jenkins | grep -v grep 
+-> Look at the first column to see the real running user of the Jenkins process right now.
+# Force a full Jenkins service restart:
+	[] sudo systemctl restart jenkins 
+-> Then wait ~30 seconds and check status with:
+	[] sudo systemctl status Jenkins
+-> A reload/pipeline re-run is NOT enough group membership is only re-evaluated when the process itself restarts.
+# Test docker access as jenkins user directly:
+	[] sudo -u jenkins docker ps 
+-> Directly in the terminal (not through a Jenkins job). If this alone still fails with permission denied, the issue is confirmed to be OS-level group config, not Jenkins config.
+# Rule out Jenkins-in-Docker scenario:
+-> If Jenkins is running as a Docker container itself (check with: docker ps and look for a jenkins container), the group-add approach on the host won't apply inside the container this needs a different fix.
+-> Go back into Jenkins and click Build Now again on your pipeline job.
