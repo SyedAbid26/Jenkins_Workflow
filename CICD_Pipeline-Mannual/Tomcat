@@ -9,9 +9,10 @@ Tomcat Installation:
 	[] cd conf/
 -> Add below lines in tomcatusers.xml
 	[] vi tomcatusers.xml
-	<role rolename=”manager-gui”/>
-	<role rolename=”manager-script”/>
-	<user username=”tomcat” password=”tomcat” roles=”manager-script,manager-gui”/>
+		<role rolename=”manager-gui”/>
+		<role rolename=”manager-script”/>
+		<user username=”tomcat” password=”tomcat” roles=”manager-script,manager-gui”/>
+	[] Esc > :wq! 
 -> After adding above lines save the file
 -> Navigate to apache-tomcat-9.0.120/webapps/manager/META-INF
 	[] vi context.xml
@@ -20,6 +21,7 @@ Tomcat Installation:
 	  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
 	        allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
 	-->
+	[] Esc > :wq!
 -> Save the file and exit.
 -> Start the tomcat 
 	[] cd apache-tomcat-9.0.120/bin
