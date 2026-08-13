@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'Maven'
+    }
+    
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', credentialsId: 'GIT', url: ''
+            }
+        }
+        
+        stage('Verify Tools') {
+            steps {
+                sh 'mvn -version'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('Sonarqube') {
+                    sh '''
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=webapp \
+                    -Dsonar.projectName=webapp
+                    '''
+                }
+            }
+        }
+
+        stage('Artifact Uploader') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'my-app', classifier: '', file: 'target/my-app.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.company', nexusUrl: 'PubIP:8081', nexusVersion: 'nexus3', protocol: 'http', repository: '', version: '1.0-SNAPSHOT'
+            }
+        }
+
+        stage('Deploying to Tomcat') {
+            steps {
+                sshagent(['SSH']) {
+                    sh 'scp -o StrictHostKeyChecking=no target/my-app.war root@PubIP:/root/apache-tomcat/webapps/'
+                }
+            }
+        }
+    }
+}
