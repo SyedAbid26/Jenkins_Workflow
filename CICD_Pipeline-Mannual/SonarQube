@@ -1,4 +1,3 @@
-
 SonarQube Integration & Configuration:
 
 Prerequisites:
@@ -68,19 +67,19 @@ Setup Systemd Service:
   	  After=syslog.target network.target
 
   	  [Service]
-    	  Type=forking
+      Type=forking
   	  User=sonar
   	  Group=sonar
   	  PermissionsStartOnly=true
   	  ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start 
-    	  ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
-    	  StandardOutput=syslog
-    	  LimitNOFILE=65536
-    	  LimitNPROC=4096
-    	  TimeoutStartSec=5
-    	  Restart=always
+      ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+	  StandardOutput=syslog
+      LimitNOFILE=65536
+      LimitNPROC=4096
+      TimeoutStartSec=5
+      Restart=always
 
-    	  [Install]
+      [Install]
   	  WantedBy=multi-user.target
 	[] Esc > :wq!
 -> Add sonar user and grant ownership to /opt/sonarqube directory 
