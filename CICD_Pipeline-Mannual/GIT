@@ -1,4 +1,4 @@
-Git integration:
+GIT integration:
 
 -> For git integration first we must install git in Jenkins server.
 	[] yum -y install git
