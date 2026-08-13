@@ -1,4 +1,4 @@
-We have to integrate CI/CD in one go, so that jobs run one after another. For that, we need to install a plugin. Steps:
+Integrating CI/CD in one go, so that jobs run one after another. For that, we need to install a plugin. Steps:
 
 Install the Build Pipeline plugin: 
 -> Go to Manage Jenkins > Plugins > Install Build Pipeline Plugin
